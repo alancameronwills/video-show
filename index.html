@@ -104,15 +104,27 @@
 			b(r.state == "paused", "pause");
 			b(r.state == "stopped", "stop");
 		}
+		function mute() {
+			if (g("mute").classList.contains("on")) {
+				operation("unmute");
+			} else {
+				operation("mute");
+			}
+		}
+		function ticks() {
+			setInterval(()=>{
+				operation();
+			}, 2000);
+		}
 	</script>
 </head>
 
-<body onload="operation()">
+<body onload="ticks()">
 	<div>
 		<h1 id="title" style="font-size: large; font-family: sans-serif;">Title</h1>
 		<p id="file">File</p>
 	</div>
-	<button id="mute" class="textbutton" onclick="operation('mute')">mute</button>
+	<button id="mute" class="textbutton" onclick="mute()">mute</button>
 	<div id="controls">
 		<button id="stop" onclick="operation('stop')">
 			<svg viewbox="0 0 100 100" width="100%">
