@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Expires" content="0" />
+	<title>Video show</title>
+	<link rel="icon" type="image/png" href="img/logo.png">
+	<style>
+		body {
+			box-sizing: content-box;
+			padding: 0 10%;
+			margin: 0;
+			height: 100vh;
+			bottom: 0;
+			display: flex;
+			flex-direction: column;
+			align-content: center;
+			justify-content: space-evenly;
+			background: linear-gradient(144deg, rgba(170, 39, 5, 1) 0%, rgba(44, 110, 110, 1) 50%, rgba(156, 72, 180, 1) 97%);
+		}
+
+		button {
+			background-color: darkgreen;
+			color: white;
+			border-radius: 10px;
+			display: grid;
+			font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+			font-size: xx-large;
+		}
+		.textbutton {
+			padding: 0.5em 0;
+		}
+
+		.on {
+			background-color: darkred;
+		}
+
+		.progress {
+			width: 100%;
+			position: relative;
+			display: flex;
+			justify-content: space-between;
+			flex-wrap: wrap;
+		}
+
+		#controls {
+			display: flex;
+			justify-content: space-between;
+			gap: 1em;
+			max-width: 90vw;
+		}
+
+		#progressbar {
+			width: 100%;
+			height: 6px;
+			background-color: gold;
+		}
+
+		#scale {
+			background-color: blue;
+			height: 100%;
+			left: 0;
+			position: relative;
+		}
+
+		.label {
+			background-color: rgba(0, 0, 0, 0.3);
+			color: white;
+		}
+	</style>
+	<script>
+		function operation(op, value) {
+			fetch(`operation?action=${op}&v=${value}`)
+				.then(r => r.json())
+				.then(r => parseResponse(r));
+		}
+		function g(field) {
+			return document.getElementById(field);
+		}
+		function h(value, field) {
+			g(field).innerHTML = (value || "").replace("<", "&lt;");
+		}
+		function b(on, field) {
+			if (on) {
+				g(field).classList.add("on");
+			} else {
+				g(field).classList.remove("on");
+			}
+		}
+		function parseResponse(r) {
+			h(r.title, "title");
+			h(r.file, "file");
+			h(r.length, "length");
+			h(r.time, "time");
+			b(r.volume == 0, "mute");
+			if (isFinite(r.position) && r.position <= 1) {
+				g("scale").style.width = `${r.position * 100}%`;
+			}
+			b(r.state == "playing", "play");
+			b(r.state == "paused", "pause");
+			b(r.state == "stopped", "stop");
+		}
+	</script>
+</head>
+
+<body>
+	<div>
+		<h1 id="title" style="font-size: large; font-family: sans-serif;">Title</h1>
+		<p id="file">File</p>
+	</div>
+	<button id="mute" class="textbutton" onclick="operation('mute')">mute</button>
+	<div id="controls">
+		<button id="stop" onclick="operation('stop')">
+			<svg viewbox="0 0 100 100" width="100%">
+				<polygon points="20 20, 20 80, 80 80, 80 20"></polygon>
+			</svg>
+		</button>
+		<button id="pause" onclick="operation('pause')">
+			<svg viewbox="0 0 100 100" width="100%">
+				<polygon points="20 20, 20 80, 40 80, 40 20"></polygon>
+				<polygon points="60 20, 60 80, 80 80, 80 20"></polygon>
+			</svg>
+		</button>
+		<button id="play"onclick="operation('play')">
+			<svg viewbox="0 0 100 100" width="100%">
+				<polygon points="20 20, 20 80, 80 50"></polygon>
+			</svg>
+		</button>
+		<button id="next"onclick="operation('next')">
+			<svg viewbox="0 0 100 100" width="100%">
+				<polygon points="20 20, 20 30, 70 50, 20 70, 20 80, 80 50, "></polygon>
+			</svg>
+		</button>
+	</div>
+	<div class="progress">
+		<div id="time">00</div>
+		<div id="" length">00</div>
+		<div id="progressbar">
+			<div id="scale"></div>
+		</div>
+	</div>
+	<div></div>
+</body>
+
+</html>
