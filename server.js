@@ -22,7 +22,7 @@ const contentTypes = {
 	let root = await fs.realpath('.');
 	root = root.replace("/server", "");
 	donationLog = `${root}/log-donations.log`;
-	const clientRoot = `${root}/client`;
+	const clientRoot = `${root}/`;
 	const credentials = null; //await getCredentials(root, argv?.[3]);
 
 	const handlers = {
