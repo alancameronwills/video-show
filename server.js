@@ -153,11 +153,9 @@ async function operation(params, credentials) {
 	} catch (err) {
 		let errReport = util.inspect(err);
 		if (errReport.indexOf("fetch failed") >= 0) errReport = errReport.match(/cause:(.*)\n/)?.[1] || errReport;
-		retryLog += `    ${params.action || params.amount} ${errReport} \n`;
-		verbose(`${params.action || params.amount} Card operation: ${url} \n ${util.inspect(http)}\nError: ${util.inspect(err)}`);
+		verbose(`${params.action || params.amount} operation: ${url} \n ${util.inspect(http)}\nError: ${util.inspect(err)}`);
 		response = { body: JSON.stringify({ fetchFail: errReport }), status: 400, contentType: "application/json" };
 	}
-	log(retryLog);
 	return response;
 }
 
