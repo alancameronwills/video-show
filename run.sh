@@ -1,3 +1,6 @@
+#!/bin/bash
+cd `dirname $BASH_SOURCE`
+
 # Start show after a delay, default 5s
 
 export DISPLAY=:0
@@ -12,4 +15,4 @@ date > ~/log.txt
 
 kill -9 `ps x | grep server | awk -- 'FNR == 1 {print $1}'`
 
-node server.js 80 &
+sudo node server.js 80 &
