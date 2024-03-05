@@ -82,7 +82,7 @@
 			return document.getElementById(field);
 		}
 		function h(value, field) {
-			g(field).innerHTML = (value || "").replace("<", "&lt;");
+			g(field).innerHTML = (""+(value || "")).replace("<", "&lt;");
 		}
 		function b(on, field) {
 			if (on) {
