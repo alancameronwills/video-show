@@ -23,7 +23,7 @@ const contentTypes = {
 	root = root.replace("/server", "");
 	donationLog = `${root}/log-donations.log`;
 	const clientRoot = `${root}/client`;
-	const credentials = await getCredentials(root, argv?.[3]);
+	const credentials = null; //await getCredentials(root, argv?.[3]);
 
 	const handlers = {
 		"get-url": getUrl,
