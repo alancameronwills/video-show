@@ -136,9 +136,9 @@ async function operation(params, credentials) {
 		let jsonData = await fetch(url, http).then(r => r.json());
 		let report =
 		{
-			title: jsonData?.information?.meta?.now_playing,
-			file: jsonData?.information?.meta?.filename,
-			artwork: jsonData?.information?.meta?.artwork_url,
+			title: jsonData?.information?.category?.meta?.now_playing,
+			file: jsonData?.information?.category?.meta?.filename,
+			artwork: jsonData?.information?.category?.meta?.artwork_url,
 			position: jsonData?.position,
 			time: jsonData?.time,
 			length: jsonData?.length,
@@ -146,9 +146,7 @@ async function operation(params, credentials) {
 			state: jsonData?.state
 		};
 		response = {
-			body: JSON.stringify(
-				{ Content: jsonData, Response: report }
-			), status: 200, contentType: "application/json"
+			body: JSON.stringify(report), status: 200, contentType: "application/json"
 		};
 	} catch (err) {
 		let errReport = util.inspect(err);
