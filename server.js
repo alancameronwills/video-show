@@ -148,7 +148,7 @@ async function operation(params, credentials) {
 		response = {
 			body: JSON.stringify(
 				{ Content: jsonData, Response: report }
-			), status: reply.status, contentType: contentType
+			), status: 200, contentType: "application/json"
 		};
 	} catch (err) {
 		let errReport = util.inspect(err);
