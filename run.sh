@@ -1,4 +1,7 @@
 #!/bin/bash
+exec 2>&1 1>~/log.txt
+date
+
 cd `dirname $BASH_SOURCE`
 
 kill -9 `ps x | grep git | awk -- 'FNR == 1 {print $1}'`
@@ -15,5 +18,3 @@ vlc -I dummy --extraintf=http --http-password=vlc --fullscreen --loop --video-on
 
 kill -9 `ps x | grep server | awk -- 'FNR == 1 {print $1}'`
 sudo node server.js 80 &
-
-date > ~/log.txt
