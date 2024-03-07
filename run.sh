@@ -4,11 +4,17 @@ date
 
 cd `dirname $BASH_SOURCE`
 
-kill -9 `ps x | grep git | awk -- 'FNR == 1 {print $1}'`
-git pull &
 
-# Start show after a delay, default 30s
-sleep ${1:-30}s
+if ["$1" -ne "0"] ;
+then
+  # Start show after a delay, default 30s
+  sleep ${1:-30}s
+  
+  kill -9 `ps x | grep git | awk -- 'FNR == 1 {print $1}'`
+  git pull &
+
+  sleep 10s
+fi
 
 kill -9 `ps x | grep vlc | awk -- 'FNR == 1 {print $1}'`
 export DISPLAY=:0
