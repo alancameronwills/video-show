@@ -39,6 +39,7 @@
 		.on:not(.inactive) {
 			background-color: darkred;
 		}
+
 		.inactive {
 			background-color: gray;
 		}
@@ -79,19 +80,19 @@
 	<script>
 		var waitingFetch = 0;
 		function operation(op, value) {
-			try {
-				waitingFetch++;
-				fetch(`operation?action=${op}&v=${value}`)
-					.then(r => r.json())
-					.then(r => {
-						parseResponse(r); 
-						waitingFetch = 0;
-					});
-			} catch {
-				if (waitingFetch > 3) {
-					parseResponse({})
-				}
-			}
+
+			waitingFetch++;
+			fetch(`operation?action=${op}&v=${value}`)
+				.then(r => r.json())
+				.then(r => {
+					parseResponse(r);
+					waitingFetch = 0;
+				})
+				.catch(() => {
+					if (waitingFetch > 3) {
+						parseResponse({})
+					}
+				});
 		}
 		function g(field) {
 			return document.getElementById(field);
