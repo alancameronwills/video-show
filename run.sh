@@ -5,7 +5,7 @@ date
 cd `dirname $BASH_SOURCE`
 
 
-if [ "x$1" -ne "x0" ] 
+if [ "0$1" -ne "0" ] 
 then
   # Start show after a delay, default 30s
   sleep ${1:-30}s
