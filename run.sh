@@ -22,5 +22,5 @@ vlc -I dummy --extraintf=http --http-password=vlc --fullscreen --loop --video-on
  --no-osd --mouse-hide-timeout=1 --skip-frames \
   /media/alan/*/*.m* >/dev/null &
 
-sudo kill -9 `ps x | grep server | awk '{print $1}'`
+sudo kill -9 `ps aux | grep server | awk '{print $2}'`
 sudo node server.js 80 &
