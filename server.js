@@ -251,7 +251,7 @@ const lightSensor = new Gpio(17, {
 	pullUpDown:Gpio.PUD_OFF, 
 	alert:true
 });
-lightSensor.glitchFilter(1000);
+//lightSensor.glitchFilter(1000);
 
 let startTime = 0;
 let interval = 0;
@@ -285,12 +285,12 @@ setInterval(()=> {
 	}, 10); // 1uF x 1k = 1ms
 },1000);
 */
-
+let r = 0;
 lightSensor.on('alert', (level, tick) => {
 	if (level == 1) {
-		log(`on  ${(tick>>0)-(onTick>>0)}`);
+		r = (tick>>0)-(onTick>>0);
 	} else {
-		log(`off ${(tick>>0)-(offTick>>0)}`);
+		log(`${r} ${(tick>>0)-(offTick>>0)}`);
 	}
 });
 
@@ -300,7 +300,7 @@ led.on('alert', (level, tick) =>{
 		onTick = tick;
 	} else {
 		offTick = tick;
-		log (`led ${(offTick>>0)-(onTick>>0)}`);
+		//log (`led ${(offTick>>0)-(onTick>>0)}`);
 	}
 });
 let ledState = false;
