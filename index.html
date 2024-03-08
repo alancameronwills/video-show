@@ -101,7 +101,7 @@
 			g(field).innerHTML = ("" + (value || "")).replace("<", "&lt;");
 		}
 		function b(state, value, field) {
-			if (state === null) g(field).classList.add("inactive");
+			if (state==null) g(field).classList.add("inactive");
 			else {
 				g(field).classList.remove("inactive");
 				if (state == value) {
