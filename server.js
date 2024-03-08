@@ -24,13 +24,15 @@ const contentTypes = {
 	".txt": "text/plain"
 };
 
+
+let report = {}; // most recent state of player
+
 (async () => {
 	let root = await fs.realpath('.');
 	root = root.replace("/server", "");
 	donationLog = `${root}/log-donations.log`;
 	const clientRoot = `${root}/`;
 
-	let report = {}; // most recent state of player
 
 	const handlers = {
 		"get-url": getUrl,
