@@ -101,7 +101,7 @@
 			g(field).innerHTML = ("" + (value || "")).replace("<", "&lt;");
 		}
 		function b(state, value, field) {
-			if (!state) g(field).classList.add("inactive");
+			if (state === null) g(field).classList.add("inactive");
 			else {
 				g(field).classList.remove("inactive");
 				if (state == value) {
@@ -112,17 +112,17 @@
 			}
 		}
 		function parseResponse(r) {
-			h(r.title, "title");
-			h(r.file, "file");
-			h(r.length, "length");
-			h(r.time, "time");
-			b(r.volume, 0, "mute");
-			if (isFinite(r.position) && r.position <= 1) {
+			h(r?.title, "title");
+			h(r?.file, "file");
+			h(r?.length, "length");
+			h(r?.time, "time");
+			b(r?.volume, 0, "mute");
+			if (isFinite(r?.position) && r.position <= 1) {
 				g("scale").style.width = `${r.position * 100}%`;
 			}
-			b(r.state, "playing", "play");
-			b(r.state, "paused", "pause");
-			b(r.state, "stopped", "stop");
+			b(r?.state, "playing", "play");
+			b(r?.state, "paused", "pause");
+			b(r?.state, "stopped", "stop");
 		}
 		function mute() {
 			if (g("mute").classList.contains("on")) {
