@@ -1,7 +1,20 @@
 #!/bin/bash
 exec 2>&1 1>~/log.txt
-cd `dirname $BASH_SOURCE`
 date
+
+cd `dirname $BASH_SOURCE`
+
+
+if [ "${1:-30}" -ne "0" ] 
+then
+  # Start show after a delay, default 30s
+  sleep ${1:-30}s
+  
+  kill -9 `ps x | grep git | awk '{print $1}'`
+  git pull &
+
+  sleep 20s
+fi
 
 kill -9 `ps x | grep vlc | awk '{print $1}'`
 export DISPLAY=:0
@@ -11,9 +24,3 @@ vlc -I dummy --extraintf=http --http-password=vlc --fullscreen --loop --video-on
 
 sudo kill -9 `ps aux | grep server | awk '{print $2}'`
 sudo node server.js 80 &
-
-sleep 20s
-kill -9 `ps x | grep git | awk '{print $1}'`
-git pull &
-
-
