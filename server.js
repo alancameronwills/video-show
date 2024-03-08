@@ -294,7 +294,7 @@ lightSensor.on('alert', (level, tick) => {
 	}
 });
 
-const led = new Gpio(27, {mode:Gpio.OUTPUT});
+const led = new Gpio(27, {mode:Gpio.OUTPUT, alert:true});
 led.on('alert', (level, tick) =>{
 	if (level == 1) {
 		onTick = tick;
