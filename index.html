@@ -123,6 +123,7 @@
 			b(r?.state, "playing", "play");
 			b(r?.state, "paused", "pause");
 			b(r?.state, "stopped", "stop");
+			b(r?.position, 100, "next");
 		}
 		function mute() {
 			if (g("mute").classList.contains("on")) {
