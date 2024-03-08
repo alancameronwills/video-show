@@ -300,6 +300,7 @@ led.on('alert', (level, tick) =>{
 		onTick = tick;
 	} else {
 		offTick = tick;
+		log (`led ${(offTick>>0)-(onTick>>0)}`);
 	}
 });
 let ledState = false;
