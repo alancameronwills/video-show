@@ -1,15 +1,9 @@
-// server.js
-
 const http = require('http');
 const util = require('util');
 const fs = require('fs/promises');
-
 const { argv } = require('process');
 
 const logverbose = false;
-
-
-const credentials = "Basic OnZsYw==";  // vlc //await getCredentials(root, argv?.[3]);
 
 const contentTypes = {
 	".css": "text/css",
@@ -24,19 +18,15 @@ const contentTypes = {
 	".txt": "text/plain"
 };
 
-
-let report = {}; // most recent state of player
-
 (async () => {
 	let root = await fs.realpath('.');
 	root = root.replace("/server", "");
 	donationLog = `${root}/log-donations.log`;
 	const clientRoot = `${root}/`;
-
+	const credentials = null; //await getCredentials(root, argv?.[3]);
 
 	const handlers = {
 		"get-url": getUrl,
-		"detector": toggleDetector,
 		"operation": operation,
 		"list-slides": listSlides,
 		"ping": async () => { return { body: 'pong', status: 200, contentType: "text/plain" } },
@@ -55,7 +45,7 @@ let report = {}; // most recent state of player
 					if (req.path.indexOf("/" + k) == 0) {
 						(async () => {
 							try {
-								let reply = await handlers[k](req.params, clientRoot);
+								let reply = await handlers[k](req.params, credentials, clientRoot);
 								response.writeHead(reply.status, { "Content-Type": reply.contentType });
 								response.end(reply.body);
 							} catch (err) {
@@ -125,7 +115,7 @@ function operationRequest(params) {
 	}
 	let url = "http://127.0.0.1:8080/requests/status.json" + suffix;
 	let headers = {
-		"Authorization": credentials,
+		"Authorization": "Basic OnZsYw==",
 		"Content-Type": "application/json"
 	};
 	let http = {
@@ -138,19 +128,13 @@ function operationRequest(params) {
 	return { url, http };
 }
 
-var detectorEnabled = true;
-
-async function toggleDetector(params) {
-	detectorEnabled = !detectorEnabled;
-}
-
-async function operation(params) {
-	let { url, http } = operationRequest(params);
+async function operation(params, credentials) {
+	let { url, http } = operationRequest(params, credentials);
 	let response = {};
 	let gotResponse = false;
 	try {
 		let jsonData = await fetch(url, http).then(r => r.json());
-		report =
+		let report =
 		{
 			title: jsonData?.information?.category?.meta?.now_playing,
 			file: jsonData?.information?.category?.meta?.filename,
@@ -159,8 +143,7 @@ async function operation(params) {
 			time: jsonData?.time,
 			length: jsonData?.length,
 			volume: jsonData?.volume,
-			state: jsonData?.state,
-			detector: detectorEnabled
+			state: jsonData?.state
 		};
 		response = {
 			body: JSON.stringify(report), status: 200, contentType: "application/json"
@@ -174,21 +157,11 @@ async function operation(params) {
 	return response;
 }
 
-function unmuteFromSensor() {
-	if ((report?.volume||100)<10 && detectorEnabled) {
-		operation({action:"unmute"});
-		setTimeout(()=> {
-			if (detectorEnabled)
-				operation({action: "mute"});
-		},600000);
-	}
-}
-
 async function sleepForSeconds(seconds) {
 	return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
 }
 
-async function listSlides(params) {
+async function listSlides(params, credentials, clientRoot) {
 	let imgdir = await fs.readdir("/media/alan/", { withFileTypes: true });
 	let slidesDir = "";
 	for (let item of imgdir) {
@@ -198,7 +171,7 @@ async function listSlides(params) {
 		}
 	}
 	let dir = await fs.readdir(`/media/alan/${slidesDir}`);
-	return { body: JSON.stringify(dir.filter(fn=> fn.indexOf('.')>0)), contentType: "application/json", status: 200 };
+	return { body: JSON.stringify(dir), contentType: "application/json", status: 200 };
 }
 
 async function getUrl(params) {
@@ -238,81 +211,6 @@ function parseReq(request, defaultPage = "/index.html") {
 	}, {});
 	return { path: path, extension: extension, query: query, params: params, host: host, url: url, method: method, headers: headers };
 }
-
-// ******************************************
-// LIGHT SENSOR
-// https://github.com/fivdi/pigpio/blob/master/README.md
-// Room illumination 10..100lux --> LDR 10k..2k
-// Connect GPIO17 -- 0.5k -- (LDR || 1uF) -- 0V
-
-const Gpio = require('pigpio').Gpio;
-const lightSensor = new Gpio(17, {
-	mode:Gpio.INPUT, 
-	pullUpDown:Gpio.PUD_OFF, 
-	alert:true
-});
-//lightSensor.glitchFilter(1000);
-
-let startTime = 0;
-let interval = 0;
-let previousInterval = 0;
-let onTick = 0;
-let offTick = 0;
-
-/*
-lightSensor.on('alert', (level, tick) => {
-	if (level==1) {
-		startTime = tick;
-		interval = 1000000;
-		log ("on");
-	} else {
-		interval = (tick>>0) - (startTime>>0);
-		// Dark 1000k -> 1s, mid 10k -> 10ms, light 1k -> 1ms
-		log(interval);
-	}
-});
-
-setInterval(()=> {
-	if (previousInterval != 0 && Math.abs(interval-previousInterval) > 10) {
-		unmuteFromSensor();
-	}
-	previousInterval = interval;
-	lightSensor.mode(Gpio.OUTPUT);
-	lightSensor.digitalWrite(1);
-	setTimeout(()=>{
-		lightSensor.mode(Gpio.INPUT);
-		lightSensor.pullUpDown(Gpio.PUD_OFF);
-	}, 10); // 1uF x 1k = 1ms
-},1000);
-*/
-let r = 0;
-lightSensor.on('alert', (level, tick) => {
-	if (level == 1) {
-		r = (tick>>0)-(onTick>>0);
-	} else {
-		log(`${r} ${(tick>>0)-(offTick>>0)}`);
-	}
-});
-
-const led = new Gpio(27, {mode:Gpio.OUTPUT, alert:true});
-led.on('alert', (level, tick) =>{
-	if (level == 1) {
-		onTick = tick;
-	} else {
-		offTick = tick;
-		//log (`led ${(offTick>>0)-(onTick>>0)}`);
-	}
-});
-let ledState = false;
-setInterval(() => {
-	ledState = !ledState;
-	led.digitalWrite(ledState ? 1 : 0);
-}, 1000);
-
-
-
-// ******************************************
-// LOG
 
 function verbose(msg) {
 	if (logverbose) log(msg);

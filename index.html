@@ -31,17 +31,12 @@
 			font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 			font-size: xx-large;
 		}
-
 		.textbutton {
 			padding: 0.5em 0;
 		}
 
-		.on:not(.inactive) {
+		.on {
 			background-color: darkred;
-		}
-
-		.inactive {
-			background-color: gray;
 		}
 
 		.progress {
@@ -78,52 +73,36 @@
 		}
 	</style>
 	<script>
-		var waitingFetch = 0;
 		function operation(op, value) {
-
-			waitingFetch++;
 			fetch(`operation?action=${op}&v=${value}`)
 				.then(r => r.json())
-				.then(r => {
-					parseResponse(r);
-					waitingFetch = 0;
-				})
-				.catch(() => {
-					if (waitingFetch > 3) {
-						parseResponse({})
-					}
-				});
+				.then(r => parseResponse(r));
 		}
 		function g(field) {
 			return document.getElementById(field);
 		}
 		function h(value, field) {
-			g(field).innerHTML = ("" + (value || "")).replace("<", "&lt;");
+			g(field).innerHTML = (""+(value || "")).replace("<", "&lt;");
 		}
-		function b(state, value, field) {
-			if (state==null) g(field).classList.add("inactive");
-			else {
-				g(field).classList.remove("inactive");
-				if (state == value) {
-					g(field).classList.add("on");
-				} else {
-					g(field).classList.remove("on");
-				}
+		function b(on, field) {
+			if (on) {
+				g(field).classList.add("on");
+			} else {
+				g(field).classList.remove("on");
 			}
 		}
 		function parseResponse(r) {
-			h(r?.title, "title");
-			h(r?.file, "file");
-			h(r?.length, "length");
-			h(r?.time, "time");
-			b(r?.volume, 0, "mute");
-			if (isFinite(r?.position) && r.position <= 1) {
+			h(r.title, "title");
+			h(r.file, "file");
+			h(r.length, "length");
+			h(r.time, "time");
+			b(r.volume == 0, "mute");
+			if (isFinite(r.position) && r.position <= 1) {
 				g("scale").style.width = `${r.position * 100}%`;
 			}
-			b(r?.state, "playing", "play");
-			b(r?.state, "paused", "pause");
-			b(r?.state, "stopped", "stop");
-			b(r?.position, 100, "next");
+			b(r.state == "playing", "play");
+			b(r.state == "paused", "pause");
+			b(r.state == "stopped", "stop");
 		}
 		function mute() {
 			if (g("mute").classList.contains("on")) {
@@ -133,7 +112,7 @@
 			}
 		}
 		function ticks() {
-			setInterval(() => {
+			setInterval(()=>{
 				operation();
 			}, 2000);
 		}
@@ -158,12 +137,12 @@
 				<polygon points="60 20, 60 80, 80 80, 80 20"></polygon>
 			</svg>
 		</button>
-		<button id="play" onclick="operation('play')">
+		<button id="play"onclick="operation('play')">
 			<svg viewbox="0 0 100 100" width="100%">
 				<polygon points="20 20, 20 80, 80 50"></polygon>
 			</svg>
 		</button>
-		<button id="next" onclick="operation('next')">
+		<button id="next"onclick="operation('next')">
 			<svg viewbox="0 0 100 100" width="100%">
 				<polygon points="20 20, 20 30, 70 50, 20 70, 20 80, 80 50 "></polygon>
 			</svg>
