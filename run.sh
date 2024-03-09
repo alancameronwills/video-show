@@ -14,7 +14,7 @@ kill -9 `ps x | grep vlc | awk -- 'FNR == 1 {print $1}'`
 export DISPLAY=:0
 vlc -I dummy --extraintf=http --http-password=vlc --fullscreen --loop --video-on-top \
   --no-osd --mouse-hide-timeout=1 --skip-frames \
-  --alsa-audio-device hw:0,0 \
+  --alsa-audio-device hw:1,0 \
   /media/alan/*/*.m* >/dev/null &
 
 kill -9 `ps x | grep server | awk -- 'FNR == 1 {print $1}'`
