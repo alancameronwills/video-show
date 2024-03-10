@@ -80,6 +80,31 @@
 		}
 	</style>
 	<script>
+		class Grapher {
+			constructor () {
+				this.oa = 0;
+				this.ob = 0;
+				this.ma = [];
+				this.mb = [];
+			}
+			add(a,b) {
+				if (this.oa>0) {
+					let pa = Math.round(100*(a - oa)/oa);
+					h(pa, "a");
+					this.ma.push(pa);
+					if (this.ma.length>10) this.ma.shift();
+				}
+				this.oa = a;
+				if (this.ob>0) {
+					let pb = Math.round(100*(b - ob)/ob);
+					h(pb, "b");
+					this.mb.push(pb);
+					if (this.mb.length>10) this.mb.shift();
+				}
+				this.ob = b;
+			}
+		}
+		let grapher = new Grapher();
 		function operation(op, value) {
 			fetch(`operation?action=${op}&v=${value}`)
 				.then(r => r.json())
@@ -110,8 +135,7 @@
 			b(r.state == "playing", "play");
 			b(r.state == "paused", "pause");
 			b(r.state == "stopped", "stop");
-			h(r.a, "a");
-			h(r.b, "b");
+			grapher.add(r.a, r.b);
 		}
 		function mute() {
 			if (g("mute").classList.contains("on")) {
