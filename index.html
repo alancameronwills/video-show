@@ -128,7 +128,7 @@
 				}
 			}
 		}
-		let grapher = new Grapher();
+		let grapher ;
 		function operation(op, value) {
 			fetch(`operation?action=${op}&v=${value}`)
 				.then(r => r.json())
@@ -168,7 +168,8 @@
 				operation("mute");
 			}
 		}
-		function ticks() {
+		function start() {
+			grapher = new Grapher();
 			setInterval(() => {
 				operation();
 			}, 2000);
@@ -176,7 +177,7 @@
 	</script>
 </head>
 
-<body onload="ticks()">
+<body onload="start()">
 	<div class="nowplaying">
 		<h1 id="title" style="font-size: large; font-family: sans-serif;">Title</h1>
 		<p id="file">File</p>
