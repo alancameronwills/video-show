@@ -4,7 +4,7 @@ const fs = require('fs/promises');
 const { argv } = require('process');
 
 const logverbose = false;
-const minutesUnmute = 5;
+const minutesUnmute = 1;
 let requiredVolume = 190;
 
 let report = {};
@@ -87,6 +87,8 @@ const contentTypes = {
 		}
 	}
 
+	operation("unmute"); // init report and set timer to mute
+
 	const server = http.createServer(serve);
 	const port = process.argv[2] || 80;
 	server.listen(port);
@@ -128,6 +130,8 @@ function checkSensor() {
 		autoUnmute();
 	}
 }
+
+
 
 // ************************
 // HTTP OPERATION
