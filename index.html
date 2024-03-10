@@ -37,10 +37,12 @@
 			display: grid;
 			font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 			font-size: xx-large;
+			max-width: 20vw;
 		}
 
 		.textbutton {
 			padding: 0.5em 0;
+			width: 20vw;
 		}
 
 		.on {
@@ -191,12 +193,12 @@
 		<button id="mute" class="textbutton" onclick="mute()">mute</button>
 		<button id="voldown" onclick="operation('voldown')">
 			<svg viewbox="0 0 100 100" width="100%">
-				<polygon points = "30 30, 70 30, 70 50"></polygon>
+				<polygon points = "30 30, 70 30, 50 70"></polygon>
 			</svg>
 		</button>
 		<button id="volup" onclick="operation('volup')">
 			<svg viewbox="0 0 100 100" width="100%">
-				<polygon points = "30 50, 70 70, 30 70"></polygon>
+				<polygon points = "50 30, 70 70, 30 70"></polygon>
 			</svg>
 		</button>
 	</div>
