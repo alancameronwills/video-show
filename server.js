@@ -7,6 +7,7 @@ const logverbose = false;
 
 let a = 0, b = 0, da = 0, db = 0, bPrvs = 500;
 let threshold = 5;
+let report = {};
 
 const contentTypes = {
 	".css": "text/css",
@@ -95,6 +96,18 @@ const contentTypes = {
 
 var integration = 0;
 var muteTimer = null;
+
+function unmute() {
+	if (report?.volume == 0) {
+		operation({action:"unmute"})
+	}
+}
+function mute() {
+	if ((report?.volume || 0)>10) {
+		operation({action:"mute"});
+	}
+}
+
 function checkSensor() {
 	db = Math.round(100 * (b - bPrvs) / (bPrvs + 1));
 	bPrvs = b;
@@ -156,7 +169,7 @@ async function operation(params, credentials) {
 	let gotResponse = false;
 	try {
 		let jsonData = await fetch(url, http).then(r => r.json());
-		let report =
+		report =
 		{
 			title: jsonData?.information?.category?.meta?.now_playing,
 			file: jsonData?.information?.category?.meta?.filename,
