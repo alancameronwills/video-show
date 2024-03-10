@@ -4,9 +4,9 @@ const fs = require('fs/promises');
 const { argv } = require('process');
 
 const logverbose = false;
+const minutesUnmute = 5;
+let requiredVolume = 190;
 
-let a = 0, b = 0, da = 0, db = 0, bPrvs = 500;
-let threshold = 5;
 let report = {};
 
 const contentTypes = {
@@ -93,34 +93,44 @@ const contentTypes = {
 	log(`Server running at http://localhost:${port}`);
 })()
 
+// ********************
+// LIGHT SENSOR UNMUTE
 
 var integration = 0;
 var muteTimer = null;
+let a = 0, b = 0, bPrvs = 500;
+let threshold = 5;
 
-function unmute() {
+function autoUnmute() {
+	// Extend existing timer, or start a new one if we're muted
+	if (muteTimer || report?.volume == 0) {
+		clearTimeout(muteTimer);
+		muteTimer = setTimeout(() => {
+			autoMute();
+		}, minutesUnmute * 60 * 1000);
+	}
+	// Do nothing if user has unmuted
 	if (report?.volume == 0) {
-		operation({action:"unmute"})
-		return true;
-	} else return false;
+		operation({ action: "unmute" })
+	}
 }
-function mute() {
-	if ((report?.volume || 0)>10) {
-		operation({action:"mute"});
+function autoMute() {
+	if ((report?.volume || 0) > 10) {
+		operation({ action: "mute" });
 	}
 }
 
 function checkSensor() {
-	db = Math.round(100 * (b - bPrvs) / (bPrvs + 1));
+	let db = Math.round(100 * (b - bPrvs) / (bPrvs + 1));
 	bPrvs = b;
 	integration = Math.abs(db) + integration / 2;
 	if (integration > threshold) {
-		if (unmute()) {
-			muteTimer = setTimeout(() => {
-				mute();
-			}, 1 * 60 * 1000);
-		}
+		autoUnmute();
 	}
 }
+
+// ************************
+// HTTP OPERATION
 
 function operationRequest(params) {
 	let suffix = "";
@@ -128,8 +138,10 @@ function operationRequest(params) {
 		case "mute":
 			suffix = "?command=volume&val=0";
 			break;
+		case "voldown":
+		case "volup":
 		case "unmute":
-			suffix = "?command=volume&val=190";
+			suffix = "?command=volume&val=" + requiredVolume;
 			break;
 		case "next":
 			suffix = "?command=pl_next";
@@ -162,10 +174,17 @@ function operationRequest(params) {
 }
 
 async function operation(params, credentials) {
-	let { url, http } = operationRequest(params, credentials);
-	if (params.action == "mute" || params.action == "unmute") {
-		clearTimeout(muteTimer);
+	switch (params.action) {
+		case "voldown":
+		case "volup":
+			requiredVolume = Math.max(50, Math.min(200, requiredVolume + (params.action == "volup" ? +20 : -20)));
+			break;
+		case "mute":
+		case "unmute":
+			clearTimeout(muteTimer);
+			break;
 	}
+	let { url, http } = operationRequest(params, credentials);
 	let response = {};
 	let gotResponse = false;
 	try {
@@ -257,7 +276,7 @@ function parseReq(request, defaultPage = "/index.html") {
 // LIGHT SENSOR
 // https://github.com/fivdi/pigpio/blob/master/README.md
 // Room illumination 10..100lux --> LDR 10k..2k
-// Connect GPIO17 -- 0.5k -- (LDR || 1uF) -- 0V
+// Connect GPIO27 -- 0.5k -- LDR -- GPIO17 -- 1uF -- 0V
 
 const Gpio = require('pigpio').Gpio;
 
@@ -287,6 +306,7 @@ led.on('alert', (level, tick) => {
 		offTick = tick;
 	}
 });
+
 let ledState = false;
 setInterval(() => {
 	ledState = !ledState;

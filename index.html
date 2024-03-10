@@ -55,7 +55,7 @@
 			flex-wrap: wrap;
 		}
 
-		#controls {
+		.controls {
 			display: flex;
 			justify-content: space-between;
 			gap: 1em;
@@ -187,9 +187,21 @@
 		<h1 id="title" style="font-size: large; font-family: sans-serif;">Title</h1>
 		<p id="file">File</p>
 	</div>
-	<button id="mute" class="textbutton" onclick="mute()">mute</button>
-	<div id="controls">
-		<button id="stop" onclick="operation('stop')">
+	<div class="controls">
+		<button id="mute" class="textbutton" onclick="mute()">mute</button>
+		<button id="voldown" onclick="operation('voldown')">
+			<svg viewbox="0 0 100 100" width="100%">
+				<polygon points = "30 30, 70 30, 70 50"></polygon>
+			</svg>
+		</button>
+		<button id="volup" onclick="operation('volup')">
+			<svg viewbox="0 0 100 100" width="100%">
+				<polygon points = "30 50, 70 70, 30 70"></polygon>
+			</svg>
+		</button>
+	</div>
+	<div class="controls">
+		<button id="stop" onclick="operation('stop')" style="display:none">
 			<svg viewbox="0 0 100 100" width="100%">
 				<polygon points="20 20, 20 80, 80 80, 80 20"></polygon>
 			</svg>
