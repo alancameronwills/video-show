@@ -276,7 +276,7 @@ function parseReq(request, defaultPage = "/index.html") {
 // LIGHT SENSOR
 // https://github.com/fivdi/pigpio/blob/master/README.md
 // Room illumination 10..100lux --> LDR 10k..2k
-// Connect GPIO27 -- 0.5k -- LDR -- GPIO17 -- 1uF -- 0V
+// Connect GPIO27 -- 0.5k -- LDR -- GPIO17 -- 33uF -- 0V
 
 const Gpio = require('pigpio').Gpio;
 
@@ -288,16 +288,18 @@ const lightSensor = new Gpio(17, {
 
 let onTick = 0;
 let offTick = 0;
-let detectedOnce = 0;
 
 lightSensor.on('alert', (level, tick) => {
 	if (level == 1) {
+		// Microseconds since led on:
 		a = (tick >> 0) - (onTick >> 0);
 	} else {
+		// Microseconds since led off:
 		b = (tick >> 0) - (offTick >> 0);
 	}
 });
 
+// Not really a LED. Just pulls up/down the capacitor:
 const led = new Gpio(27, { mode: Gpio.OUTPUT, alert: true });
 led.on('alert', (level, tick) => {
 	if (level == 1) {

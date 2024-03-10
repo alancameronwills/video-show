@@ -14,7 +14,7 @@ kill -9 `ps ux | grep vlc | awk -- '{print $2}'`
 export DISPLAY=:0
 vlc -I dummy --extraintf=http --http-password=vlc --fullscreen --loop --video-on-top \
   --no-osd --mouse-hide-timeout=1 --skip-frames \
-  /media/alan/*/*.m* >/dev/null &
+  /media/alan/*/*.mov /media/alan/*/*.mp4 >/dev/null &
 
 kill -9 `ps x | grep server | awk -- '{print $2}'`
 sudo node server.js 80 &

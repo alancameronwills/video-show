@@ -87,7 +87,6 @@
 			flex-direction: row;
 			justify-content: flex-start;
 			align-items: flex-end;
-			width: 100%;
 			position: fixed;
 			bottom: 60px;
 		}
@@ -115,7 +114,7 @@
 			add(a, b) {
 				if (this.ob > 0) {
 					let pb = Math.round(100 * (b - this.ob) / this.ob);
-					//h(pb, "b");
+					if (pb==-1) pb = 0; // suppress some noise
 					this.mb.push(pb);
 					if (this.mb.length > this.length) this.mb.shift();
 					this.show();
