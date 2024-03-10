@@ -78,39 +78,43 @@
 			background-color: rgba(0, 0, 0, 0.3);
 			color: white;
 		}
+
 		.lux {
+			display: flex;
+			flex-direction: row;
+			justify-content: flex-start;
+			align-items: flex-end;
 			width: 100%;
 			position: fixed;
 			bottom: 60px;
 		}
+
 		.lux>div {
 			width: 6px;
-			position: absolute;
 			height: 0;
 			margin-left: 4px;
 			background-color: yellow;
-			display: inline-block;
 		}
 	</style>
 	<script>
 		class Grapher {
-			constructor () {
+			constructor() {
 				this.length = 20;
 				this.oa = 0;
 				this.ob = 0;
 				this.ma = [];
 				this.mb = [];
 				let lux = g("lux");
-				for (let i = 0; i<this.length; i++) {
+				for (let i = 0; i < this.length; i++) {
 					lux.appendChild(document.createElement("div"));
 				}
 			}
-			add(a,b) {
-				if (this.ob>0) {
-					let pb = Math.round(100*(b - this.ob)/this.ob);
+			add(a, b) {
+				if (this.ob > 0) {
+					let pb = Math.round(100 * (b - this.ob) / this.ob);
 					//h(pb, "b");
 					this.mb.push(pb);
-					if (this.mb.length>this.length) this.mb.shift();
+					if (this.mb.length > this.length) this.mb.shift();
 					this.show();
 				}
 				this.ob = b;
@@ -118,16 +122,16 @@
 			show() {
 				let luxColumn = g("lux").firstElementChild;
 				for (let x in this.mb) {
-					let height = (Math.min(50,Math.abs(x)*5)) + "px";
+					let height = (Math.min(50, Math.abs(x) * 5)) + "px";
 					luxColumn.style.height = height;
-					if (x>=0) luxColumn.style.bottom = "0";
-					else luxColumn.style.bottom = "-" + height;
+					if (x >= 0) luxColumn.style.bottom = "0";
+					else luxColumn.style.marginBottom = "-" + height;
 					luxColumn = luxColumn.nextElementSibling;
 					if (!luxColumn) break;
 				}
 			}
 		}
-		let grapher ;
+		let grapher;
 		function operation(op, value) {
 			fetch(`operation?action=${op}&v=${value}`)
 				.then(r => r.json())
