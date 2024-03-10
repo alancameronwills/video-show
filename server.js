@@ -5,7 +5,8 @@ const { argv } = require('process');
 
 const logverbose = false;
 
-let a = 0, b = 0;
+let a = 0, b = 0, da = 0, db = 0, bPrvs = 500;
+let threshold = 5;
 
 const contentTypes = {
 	".css": "text/css",
@@ -91,6 +92,22 @@ const contentTypes = {
 	log(`Server running at http://localhost:${port}`);
 })()
 
+
+var integration = 0;
+var muteTimer = null;
+function checkSensor() {
+	db = Math.round(100 * (b - bPrvs) / (bPrvs + 1));
+	bPrvs = b;
+	integration = Math.abs(db) + integration / 2;
+	if (integration > threshold) {
+		if (unmute()) {
+			muteTimer = setTimeout(() => {
+				mute();
+			}, 1 * 60 * 1000);
+		}
+	}
+}
+
 function operationRequest(params) {
 	let suffix = "";
 	switch (params.action) {
@@ -132,6 +149,9 @@ function operationRequest(params) {
 
 async function operation(params, credentials) {
 	let { url, http } = operationRequest(params, credentials);
+	if (params.action == "mute" || params.action == "unmute") {
+		cancelTimeout(muteTimer);
+	}
 	let response = {};
 	let gotResponse = false;
 	try {
@@ -160,6 +180,7 @@ async function operation(params, credentials) {
 	}
 	return response;
 }
+
 
 async function sleepForSeconds(seconds) {
 	return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
@@ -225,38 +246,40 @@ function parseReq(request, defaultPage = "/index.html") {
 // Connect GPIO17 -- 0.5k -- (LDR || 1uF) -- 0V
 
 const Gpio = require('pigpio').Gpio;
-if (Gpio) {
-	const lightSensor = new Gpio(17, {
-		mode: Gpio.INPUT,
-		pullUpDown: Gpio.PUD_OFF,
-		alert: true
-	});
 
-	let onTick = 0;
-	let offTick = 0;
+const lightSensor = new Gpio(17, {
+	mode: Gpio.INPUT,
+	pullUpDown: Gpio.PUD_OFF,
+	alert: true
+});
 
-	lightSensor.on('alert', (level, tick) => {
-		if (level == 1) {
-			a = (tick >> 0) - (onTick >> 0);
-		} else {
-			b = (tick >> 0) - (offTick >> 0);
-		}
-	});
+let onTick = 0;
+let offTick = 0;
+let detectedOnce = 0;
 
-	const led = new Gpio(27, { mode: Gpio.OUTPUT, alert: true });
-	led.on('alert', (level, tick) => {
-		if (level == 1) {
-			onTick = tick;
-		} else {
-			offTick = tick;
-		}
-	});
-	let ledState = false;
-	setInterval(() => {
-		ledState = !ledState;
-		led.digitalWrite(ledState ? 1 : 0);
-	}, 1000);
-}
+lightSensor.on('alert', (level, tick) => {
+	if (level == 1) {
+		a = (tick >> 0) - (onTick >> 0);
+	} else {
+		b = (tick >> 0) - (offTick >> 0);
+	}
+});
+
+const led = new Gpio(27, { mode: Gpio.OUTPUT, alert: true });
+led.on('alert', (level, tick) => {
+	if (level == 1) {
+		onTick = tick;
+	} else {
+		offTick = tick;
+	}
+});
+let ledState = false;
+setInterval(() => {
+	ledState = !ledState;
+	led.digitalWrite(ledState ? 1 : 0);
+	checkSensor();
+}, 1000);
+
 
 
 // ******************************************
