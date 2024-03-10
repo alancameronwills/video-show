@@ -5,6 +5,8 @@ const { argv } = require('process');
 
 const logverbose = false;
 
+let a = 0, b = 0;
+
 const contentTypes = {
 	".css": "text/css",
 	".htm": "text/html", ".html": "text/html",
@@ -143,7 +145,9 @@ async function operation(params, credentials) {
 			time: jsonData?.time,
 			length: jsonData?.length,
 			volume: jsonData?.volume,
-			state: jsonData?.state
+			state: jsonData?.state,
+			a: a,
+			b: b
 		};
 		response = {
 			body: JSON.stringify(report), status: 200, contentType: "application/json"
@@ -166,8 +170,8 @@ async function listSlides(params, credentials, clientRoot) {
 	let slidesDir = "";
 	for (let item of imgdir) {
 		if (item.isDirectory) {
-				slidesDir = item.name;
-				break;
+			slidesDir = item.name;
+			break;
 		}
 	}
 	let dir = await fs.readdir(`/media/alan/${slidesDir}`);
@@ -211,6 +215,52 @@ function parseReq(request, defaultPage = "/index.html") {
 	}, {});
 	return { path: path, extension: extension, query: query, params: params, host: host, url: url, method: method, headers: headers };
 }
+
+
+
+// ******************************************
+// LIGHT SENSOR
+// https://github.com/fivdi/pigpio/blob/master/README.md
+// Room illumination 10..100lux --> LDR 10k..2k
+// Connect GPIO17 -- 0.5k -- (LDR || 1uF) -- 0V
+
+const Gpio = require('pigpio').Gpio;
+if (Gpio) {
+	const lightSensor = new Gpio(17, {
+		mode: Gpio.INPUT,
+		pullUpDown: Gpio.PUD_OFF,
+		alert: true
+	});
+
+	let onTick = 0;
+	let offTick = 0;
+
+	lightSensor.on('alert', (level, tick) => {
+		if (level == 1) {
+			a = (tick >> 0) - (onTick >> 0);
+		} else {
+			b = (tick >> 0) - (offTick >> 0);
+		}
+	});
+
+	const led = new Gpio(27, { mode: Gpio.OUTPUT, alert: true });
+	led.on('alert', (level, tick) => {
+		if (level == 1) {
+			onTick = tick;
+		} else {
+			offTick = tick;
+		}
+	});
+	let ledState = false;
+	setInterval(() => {
+		ledState = !ledState;
+		led.digitalWrite(ledState ? 1 : 0);
+	}, 1000);
+}
+
+
+// ******************************************
+// LOG
 
 function verbose(msg) {
 	if (logverbose) log(msg);

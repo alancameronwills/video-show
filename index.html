@@ -46,7 +46,7 @@
 			background-color: #601010;
 		}
 
-		.progress {
+		.progress,.lux {
 			width: 100%;
 			position: relative;
 			display: flex;
@@ -110,6 +110,8 @@
 			b(r.state == "playing", "play");
 			b(r.state == "paused", "pause");
 			b(r.state == "stopped", "stop");
+			h(r.a, "a");
+			h(r.b, "b");
 		}
 		function mute() {
 			if (g("mute").classList.contains("on")) {
@@ -161,6 +163,10 @@
 		<div id="progressbar">
 			<div id="scale"></div>
 		</div>
+	</div>
+	<div class="lux">
+		<div id="a"></div>
+		<div id="b"></div>
 	</div>
 	<div></div>
 </body>
