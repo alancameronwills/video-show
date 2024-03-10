@@ -125,7 +125,7 @@
 					let v = this.mb[i];
 					let height = (Math.min(50, Math.abs(v) * 5)) + "px";
 					luxColumn.style.height = height;
-					if (x >= 0) luxColumn.style.bottom = "0";
+					if (v >= 0) luxColumn.style.bottom = "0";
 					else luxColumn.style.marginBottom = "-" + height;
 					luxColumn = luxColumn.nextElementSibling;
 					if (!luxColumn) break;
