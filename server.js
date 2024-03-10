@@ -100,7 +100,8 @@ var muteTimer = null;
 function unmute() {
 	if (report?.volume == 0) {
 		operation({action:"unmute"})
-	}
+		return true;
+	} else return false;
 }
 function mute() {
 	if ((report?.volume || 0)>10) {
@@ -163,7 +164,7 @@ function operationRequest(params) {
 async function operation(params, credentials) {
 	let { url, http } = operationRequest(params, credentials);
 	if (params.action == "mute" || params.action == "unmute") {
-		cancelTimeout(muteTimer);
+		clearTimeout(muteTimer);
 	}
 	let response = {};
 	let gotResponse = false;
