@@ -117,7 +117,7 @@
 			}
 			show() {
 				let luxColumn = g("lux").firstElementChild;
-				for (let x in mb) {
+				for (let x in this.mb) {
 					let height = (Math.min(50,Math.abs(x)*5)) + "px";
 					luxColumn.style.height = height;
 					if (x>=0) luxColumn.style.bottom = "0";
