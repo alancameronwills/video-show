@@ -87,7 +87,6 @@ const contentTypes = {
 		}
 	}
 
-	operation("unmute"); // init report and set timer to mute
 
 	const server = http.createServer(serve);
 	const port = process.argv[2] || 80;
@@ -121,6 +120,9 @@ function autoMute() {
 		operation({ action: "mute" });
 	}
 }
+
+// Initial mute after startup:
+setTimeout(autoMute, 30000);
 
 function checkSensor() {
 	let db = Math.round(100 * (b - bPrvs) / (bPrvs + 1));
