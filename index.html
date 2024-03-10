@@ -81,12 +81,11 @@
 		.lux {
 			width: 100%;
 			position: fixed;
-			bottom: 4px;
+			bottom: 60px;
 		}
 		.lux>div {
 			width: 6px;
 			position: absolute;
-			max-height: 50px;
 			height: 0;
 			margin-left: 4px;
 			background-color: yellow;
@@ -119,7 +118,7 @@
 			show() {
 				let luxColumn = g("lux").firstChildElement();
 				for (let x in mb) {
-					let height = Math.abs(x)*5 + "px";
+					let height = (Math.min(50,Math.abs(x)*5)) + "px";
 					luxColumn.style.height = height;
 					if (x>=0) luxColumn.style.bottom = "0";
 					else luxColumn.style.bottom = "-" + height;
