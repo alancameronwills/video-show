@@ -46,7 +46,7 @@
 			background-color: #601010;
 		}
 
-		.progress,.lux {
+		.progress {
 			width: 100%;
 			position: relative;
 			display: flex;
@@ -78,30 +78,54 @@
 			background-color: rgba(0, 0, 0, 0.3);
 			color: white;
 		}
+		.lux {
+			width: 100%;
+			position: fixed;
+			bottom: 4px;
+		}
+		.lux>div {
+			width: 6px;
+			position: absolute;
+			max-height: 50px;
+			height: 0;
+			margin-left: 4px;
+			background-color: yellow;
+			display: inline-block;
+		}
 	</style>
 	<script>
 		class Grapher {
 			constructor () {
+				this.length = 20;
 				this.oa = 0;
 				this.ob = 0;
 				this.ma = [];
 				this.mb = [];
+				let lux = g("lux");
+				for (let i = 0; i<this.length; i++) {
+					lux.appendChild(document.createElement("div"));
+				}
 			}
 			add(a,b) {
-				if (this.oa>0) {
-					let pa = Math.round(100*(a - this.oa)/this.oa);
-					h(pa, "a");
-					this.ma.push(pa);
-					if (this.ma.length>10) this.ma.shift();
-				}
-				this.oa = a;
 				if (this.ob>0) {
 					let pb = Math.round(100*(b - this.ob)/this.ob);
 					h(pb, "b");
 					this.mb.push(pb);
-					if (this.mb.length>10) this.mb.shift();
+					if (this.mb.length>this.length) this.mb.shift();
+					this.show();
 				}
 				this.ob = b;
+			}
+			show() {
+				let luxColumn = g("lux").firstChildElement();
+				for (let x in mb) {
+					let height = Math.abs(x)*5 + "px";
+					luxColumn.style.height = height;
+					if (x>=0) luxColumn.style.bottom = "0";
+					else luxColumn.style.bottom = "-" + height;
+					luxColumn = luxColumn.nextElementSibling;
+					if (!luxColumn) break;
+				}
 			}
 		}
 		let grapher = new Grapher();
@@ -188,11 +212,9 @@
 			<div id="scale"></div>
 		</div>
 	</div>
-	<div class="lux">
-		<div id="a"></div>
-		<div id="b"></div>
-	</div>
 	<div></div>
+	<div id="lux" class="lux">
+	</div>
 </body>
 
 </html>
