@@ -5,7 +5,7 @@ const { argv } = require('process');
 
 const logverbose = false;
 const minutesUnmute = 1;
-let requiredVolume = 190;
+let requiredVolume = 300;
 
 let report = {volume: 0};
 
@@ -183,7 +183,7 @@ async function operation(params, credentials) {
 	switch (params.action) {
 		case "voldown":
 		case "volup":
-			requiredVolume = Math.max(50, Math.min(200, requiredVolume + (params.action == "volup" ? +20 : -20)));
+			requiredVolume = Math.max(50, Math.min(400, requiredVolume + (params.action == "volup" ? +20 : -20)));
 			break;
 		case "mute":
 		case "unmute":
