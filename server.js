@@ -7,7 +7,7 @@ const logverbose = false;
 const minutesUnmute = 1;
 let requiredVolume = 190;
 
-let report = {};
+let report = {volume: 0};
 
 const contentTypes = {
 	".css": "text/css",
@@ -104,14 +104,14 @@ let threshold = 5;
 
 function autoUnmute() {
 	// Extend existing timer, or start a new one if we're muted
-	if (muteTimer || report?.volume == 0) {
+	if (muteTimer || (report?.volume||0) == 0) {
 		clearTimeout(muteTimer);
 		muteTimer = setTimeout(() => {
 			autoMute();
 		}, minutesUnmute * 60 * 1000);
 	}
 	// Do nothing if user has unmuted
-	if (report?.volume == 0) {
+	if ((report?.volume||0) == 0) {
 		operation({ action: "unmute" })
 	}
 }
