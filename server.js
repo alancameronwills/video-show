@@ -7,7 +7,7 @@ const logverbose = false;
 const minutesUnmute = 1;
 let requiredVolume = 300;
 
-let report = {volume: 0};
+let report = { volume: 0 };
 
 const contentTypes = {
 	".css": "text/css",
@@ -104,15 +104,18 @@ let threshold = 5;
 
 function autoUnmute() {
 	// Extend existing timer, or start a new one if we're muted
-	if (muteTimer || (report?.volume||0) == 0) {
+	if (muteTimer || (report?.volume || 0) == 0) {
 		clearTimeout(muteTimer);
 		muteTimer = setTimeout(() => {
 			autoMute();
 		}, minutesUnmute * 60 * 1000);
 	}
 	// Do nothing if user has unmuted
-	if ((report?.volume||0) == 0) {
-		operation({ action: "unmute" })
+	if ((report?.volume || 0) == 0) {
+		operation({ action: "unmute" });
+		//note effect on report.volume isn't immediate -
+		//relies on report being refreshed at intervals either by remote
+		//query or interval timer - see below
 	}
 }
 function autoMute() {
@@ -120,9 +123,6 @@ function autoMute() {
 		operation({ action: "mute" });
 	}
 }
-
-// Initial mute after startup:
-setTimeout(autoMute, 30000);
 
 function checkSensor() {
 	let db = Math.round(100 * (b - bPrvs) / (bPrvs + 1));
@@ -179,8 +179,11 @@ function operationRequest(params) {
 	return { url, http };
 }
 
+var lastOperation = 0;
+
 async function operation(params, credentials) {
-	switch (params.action) {
+	lastOperation = Date.now();
+	switch (params?.action) {
 		case "voldown":
 		case "volup":
 			requiredVolume = Math.max(50, Math.min(400, requiredVolume + (params.action == "volup" ? +20 : -20)));
@@ -220,6 +223,14 @@ async function operation(params, credentials) {
 	return response;
 }
 
+
+// Keep report refreshed if no remote control
+setInterval(() => {
+	if (Date.now() - lastOperation > 15000) {
+		operation({});
+	}
+},
+	10000);
 
 async function sleepForSeconds(seconds) {
 	return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
