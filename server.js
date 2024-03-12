@@ -5,7 +5,7 @@ const { argv } = require('process');
 
 const logverbose = false;
 const minutesUnmute = 1;
-let requiredVolume = 300;
+let requiredVolume = 200;
 
 let report = { volume: 0 };
 
@@ -100,7 +100,7 @@ const contentTypes = {
 var integration = 0;
 var muteTimer = null;
 let a = 0, b = 0, bPrvs = 500;
-let threshold = 5;
+let threshold = 7;
 
 function autoUnmute() {
 	// Extend existing timer, or start a new one if we're muted
